@@ -45,7 +45,7 @@ In configuration file, pass options directly:
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  reporter: [['junit', { outputFile: 'results.xml' }]],
+  reporter: [['@xray-app/playwright-junit-reporter', { outputFile: 'results.xml' }]],
 });
 ```
 
@@ -74,7 +74,7 @@ const xrayOptions = {
 };
 
 export default defineConfig({
-  reporter: [['junit', xrayOptions]]
+  reporter: [['@xray-app/playwright-junit-reporter', xrayOptions]]
 });
 ```
 
@@ -105,7 +105,7 @@ The following configuration sample enables embedding attachments by using the `t
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  reporter: [['junit', { embedAttachmentsAsProperty: 'testrun_evidence', outputFile: 'results.xml' }]],
+  reporter: [['@xray-app/playwright-junit-reporter', { embedAttachmentsAsProperty: 'testrun_evidence', outputFile: 'results.xml' }]],
 });
 ```
 
