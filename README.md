@@ -1,3 +1,11 @@
+# Enhanced Playwright JUnit XML reporter compatible with Xray
+
+[![npm version](https://img.shields.io/npm/v/@xray-app/playwright-junit-reporter.svg?style=flat-square)](https://www.npmjs.com/package/@xray-app/playwright-junit-reporter)
+[![build workflow](https://github.com/Xray-App/playwright-junit-reporter/actions/workflows/build.yml/badge.svg)](https://github.com/Xray-App/playwright-junit-reporter/actions/workflows/build.yml)
+[![license](https://img.shields.io/badge/License-Apache%202-green.svg)](https://opensource.org/license/apache-2-0/)
+[![Gitter chat](https://badges.gitter.im/gitterHQ/gitter.png)](https://gitter.im/Xray-App/community)
+[![npm downloads](https://img.shields.io/npm/dm/@xray-app/playwright-junit-reporter.svg?style=flat-square)](http://npm-stat.com/charts.html?package=@xray-app/playwright-junit-reporter)
+
 This enhanced JUnit reporter produces a JUnit-style XML report, supported by [Xray](https://www.getxray.app).
 Until Playwright v1.33, Playwright's built-in `junit` reporter provided support for Xray enhancements; as of v1.34 that support is removed from the Playwright project itself and is supported through this project, having the same set of features.
 
@@ -15,10 +23,10 @@ Run the following commands:
 
 ## Usage
 
-Most likely you want to write the report to an xml file. When running with `--reporter=junit`, use `PLAYWRIGHT_JUNIT_OUTPUT_NAME` environment variable:
+Most likely you want to write the report to an xml file. When running with `--reporter=@xray-app/playwright-junit-reporter`, use `PLAYWRIGHT_JUNIT_OUTPUT_NAME` environment variable:
 
 ```bash tab=bash-bash
-PLAYWRIGHT_JUNIT_OUTPUT_NAME=results.xml npx playwright test --reporter=junit
+PLAYWRIGHT_JUNIT_OUTPUT_NAME=results.xml npx playwright test --reporter=@xray-app/playwright-junit-reporter
 ```
 
 ```batch tab=bash-batch
