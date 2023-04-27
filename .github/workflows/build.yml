@@ -4,8 +4,13 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+
+env:
+  # Force terminal colors. @see https://www.npmjs.com/package/colors
+  FORCE_COLOR: 1
+
 jobs:
-  lint_test_coverage:
+  build:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
