@@ -12,9 +12,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '16'
-      - name: Clean workspace
-        run: npm run clean      
+          node-version: '16'     
       - name: Install dependencies and build
         run: npm ci
       - name: Run ESLint
