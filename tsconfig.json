@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+      "target": "ESNext",
+      "module": "node16",
+      "moduleResolution": "node",
+      "sourceMap": false,
+      "outDir": "./dist",
+      "declaration": true,
+      "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "./src"
+  ]
+}
