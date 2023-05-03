@@ -210,10 +210,11 @@ class XrayJUnitReporter implements Reporter {
           }
 
           if (contents) {
+            const attachmentName = attachment.name + ((attachment.path && !path.extname(attachment.name)) ? path.extname(attachment.path) : '');
             const item: XMLEntry = {
               name: 'item',
               attributes: {
-                name: attachment.name
+                name: attachmentName
               },
               text: contents
             };
