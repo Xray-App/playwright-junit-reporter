@@ -19,7 +19,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stephenkilbourn/playwright-report-summary.git"
+    "url": "git+https://github.com/Xray-App/playwright-junit-reporter.git"
   },
   "keywords": [
     "playwright",
@@ -34,7 +34,7 @@
   "homepage": "https://github.com/Xray-App/playwright-junit-reporter",
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
-    "@playwright/test": "next",
+    "@playwright/test": "^1.33.0",
     "@sinonjs/fake-timers": "^9.1.2",
     "@types/node": "^18.7.23",
     "@types/sinonjs__fake-timers": "^8.1.2",
@@ -52,8 +52,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "mock-fs": "^5.1.4",
     "nyc": "^15.1.0",
-    "playwright": "next",
-    "playwright-test": "^8.2.0",
+    "playwright": "^1.33.0",
     "playwright-test-coverage": "^1.2.0",
     "prettier": "^2.7.1",
     "rimraf": "^5.0.0",
