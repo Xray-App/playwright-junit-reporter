@@ -31,12 +31,12 @@ PLAYWRIGHT_JUNIT_OUTPUT_NAME=results.xml npx playwright test --reporter=@xray-ap
 
 ```batch tab=bash-batch
 set PLAYWRIGHT_JUNIT_OUTPUT_NAME=results.xml
-npx playwright test --reporter=junit
+npx playwright test --reporter=@xray-app/playwright-junit-reporter
 ```
 
 ```powershell tab=bash-powershell
 $env:PLAYWRIGHT_JUNIT_OUTPUT_NAME="results.xml"
-npx playwright test --reporter=junit
+npx playwright test --reporter=@xray-app/playwright-junit-reporter
 ```
 
 In configuration file, pass options directly:
