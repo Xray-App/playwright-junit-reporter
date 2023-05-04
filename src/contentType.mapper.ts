@@ -1,10 +1,4 @@
 class ContentTypeMapper{
-  fileExtension: string;
-
-  constructor() {
-    this.fileExtension = this.fileExtension;
-  }
-
   getFileExtenion(contentType: string) {
     switch (contentType) {
       case 'image/png':
