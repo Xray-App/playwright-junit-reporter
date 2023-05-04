@@ -20,6 +20,7 @@ import path from 'path';
 import type { FullConfig, FullResult, Reporter, Suite, TestCase } from '@playwright/test/reporter';
 import { formatFailure, stripAnsiEscapes } from './base';
 import { assert } from 'playwright-core/lib/utils';
+import contentTypeMapper from './contentType.mapper';
 
 export function monotonicTime(): number {
   const [seconds, nanoseconds] = process.hrtime();
@@ -210,7 +211,7 @@ class XrayJUnitReporter implements Reporter {
           }
 
           if (contents) {
-            const attachmentName = attachment.name + ((attachment.path && !path.extname(attachment.name)) ? path.extname(attachment.path) : '');
+            const attachmentName = attachment.name + ((attachment.path && !path.extname(attachment.name)) ? contentTypeMapper.getFileExtenion(attachment.contentType) : '');
             const item: XMLEntry = {
               name: 'item',
               attributes: {
