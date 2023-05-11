@@ -1,4 +1,4 @@
-type FileExtension = 'image/png' | 'text/plain' | 'video/webm' | 'application/zip';
+export type FileExtension = 'image/png' | 'text/plain' | 'video/webm' | 'application/zip';
 
 class ContentTypeMapper{
 
