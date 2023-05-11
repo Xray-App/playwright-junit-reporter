@@ -1,5 +1,8 @@
+type FileExtension = 'image/png' | 'text/plain' | 'video/webm' | 'application/zip';
+
 class ContentTypeMapper{
-  getFileExtenion(contentType: string) {
+
+  getFileExtenion(contentType: FileExtension): string {
     switch (contentType) {
       case 'image/png':
         return '.png';
@@ -9,6 +12,8 @@ class ContentTypeMapper{
         return '.webm';
       case 'application/zip':
         return '.zip';
+      default:
+        throw new console.warn(`could not map filetype of: ${contentType} to a correct ending`);
     }
   }
 }
