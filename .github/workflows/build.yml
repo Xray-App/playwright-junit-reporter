@@ -21,6 +21,8 @@ jobs:
       - name: Install dependencies and build
         run: npm ci
       - name: Run ESLint
-        run: npm run lint     
+        run: npm run lint
+      - name: Install browsers
+        run: npx playwright install
       - name: Run tests
         run: npm test
