@@ -1,6 +1,6 @@
 {
   "name": "@xray-app/playwright-junit-reporter",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "generate an enhanced JUnit XML report suitable for Xray with the playwright test results",
   "main": "./dist/index.js",
   "types": "./dist/types.d.ts",
