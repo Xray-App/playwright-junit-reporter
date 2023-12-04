@@ -18,8 +18,8 @@ import type { JSONReport, JSONReportSpec, JSONReportSuite, JSONReportTest, JSONR
 import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
-import { rimraf, PNG } from 'playwright-core/lib/utilsBundle';
-import { promisify } from 'util';
+import { PNG } from 'playwright-core/lib/utilsBundle';
+import { removeFolders } from 'playwright-core/lib/utils';
 import type { CommonFixtures, CommonWorkerFixtures, TestChildProcess } from './config/commonFixtures';
 import { commonFixtures } from './config/commonFixtures';
 import type { ServerFixtures, ServerWorkerOptions } from './config/serverFixtures';
@@ -35,8 +35,6 @@ import type { TestInfo } from './stable-test-runner';
 import { expect } from './stable-test-runner';
 import { test as base } from './stable-test-runner';
 */
-
-export const removeFolderAsync = promisify(rimraf);
 
 export type CliRunResult = {
   exitCode: number,
@@ -114,7 +112,7 @@ async function runPlaywrightTest(childProcess: CommonFixtures['childProcess'], b
   // eslint-disable-next-line prefer-const
   let { exitCode, output } = await runPlaywrightCommand(childProcess, cwd, args, {
     // PW_TEST_REPORTER: path.join(__dirname, '../../packages/playwright-test/lib/reporters/json.js'),
-    PW_TEST_REPORTER: path.join(__dirname, '../node_modules//@playwright/test/lib/reporters/json.js'),
+    PW_TEST_REPORTER: path.join(__dirname, '../node_modules/playwright/lib/reporters/json.js'),
     // PW_TEST_REPORTER: path.join(__dirname, '../dist/index.js'),
     PLAYWRIGHT_JSON_OUTPUT_NAME: reportFile,
     ...env,
@@ -268,7 +266,7 @@ export const test = base
           const baseDir = await writeFiles(testInfo, files, true);
           return await runPlaywrightTest(childProcess, baseDir, params, { ...env, PWTEST_CACHE_DIR: cacheDir }, options);
         });
-        await removeFolderAsync(cacheDir);
+        await removeFolders([cacheDir]);
       },
 
       runWatchTest: async ({ childProcess }, use, testInfo: TestInfo) => {
@@ -280,7 +278,7 @@ export const test = base
           return testProcess;
         });
         await testProcess?.kill();
-        await removeFolderAsync(cacheDir);
+        await removeFolders([cacheDir]);
       },
 
       runTSC: async ({ childProcess }, use, testInfo) => {
