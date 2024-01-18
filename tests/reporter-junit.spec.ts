@@ -44,7 +44,9 @@ test('should render expected', async ({ runInlineTest }) => {
   expect(xml['testsuites']['testsuite'][0]['$']['tests']).toBe('1');
   expect(xml['testsuites']['testsuite'][0]['$']['failures']).toBe('0');
   expect(xml['testsuites']['testsuite'][0]['$']['skipped']).toBe('0');
+  expect(path.basename(xml['testsuites']['testsuite'][0]['$']['file'])).toBe('a.test.js');
   expect(xml['testsuites']['testsuite'][1]['$']['name']).toBe('b.test.js');
+  expect(path.basename(xml['testsuites']['testsuite'][1]['$']['file'])).toBe('b.test.js');
   expect(result.exitCode).toBe(0);
 });
 
@@ -243,6 +245,7 @@ test('should not render projects if they dont exist', async ({ runInlineTest }) 
   expect(xml['testsuites']['testsuite'][0]['$']['tests']).toBe('1');
   expect(xml['testsuites']['testsuite'][0]['$']['failures']).toBe('0');
   expect(xml['testsuites']['testsuite'][0]['$']['skipped']).toBe('0');
+  expect(path.basename(xml['testsuites']['testsuite'][0]['$']['file'])).toBe('a.test.js');
   expect(xml['testsuites']['testsuite'][0]['testcase'][0]['$']['name']).toBe('one');
   expect(xml['testsuites']['testsuite'][0]['testcase'][0]['$']['classname']).toBe('a.test.js');
   expect(result.exitCode).toBe(0);
@@ -270,6 +273,7 @@ test('should render projects', async ({ runInlineTest }) => {
   expect(xml['testsuites']['testsuite'][0]['$']['tests']).toBe('1');
   expect(xml['testsuites']['testsuite'][0]['$']['failures']).toBe('0');
   expect(xml['testsuites']['testsuite'][0]['$']['skipped']).toBe('0');
+  expect(path.basename(xml['testsuites']['testsuite'][0]['$']['file'])).toBe('a.test.js');
   expect(xml['testsuites']['testsuite'][0]['testcase'][0]['$']['name']).toBe('one');
   expect(xml['testsuites']['testsuite'][0]['testcase'][0]['$']['classname']).toBe('a.test.js');
 
@@ -278,6 +282,7 @@ test('should render projects', async ({ runInlineTest }) => {
   expect(xml['testsuites']['testsuite'][1]['$']['tests']).toBe('1');
   expect(xml['testsuites']['testsuite'][1]['$']['failures']).toBe('0');
   expect(xml['testsuites']['testsuite'][1]['$']['skipped']).toBe('0');
+  expect(path.basename(xml['testsuites']['testsuite'][1]['$']['file'])).toBe('a.test.js');
   expect(xml['testsuites']['testsuite'][1]['testcase'][0]['$']['name']).toBe('one');
   expect(xml['testsuites']['testsuite'][1]['testcase'][0]['$']['classname']).toBe('a.test.js');
   expect(result.exitCode).toBe(0);
