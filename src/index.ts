@@ -130,6 +130,7 @@ class XrayJUnitReporter implements Reporter {
         skipped,
         time: duration / 1000,
         errors: 0,
+        file: suite.location?.file || '',
       },
       children
     };
