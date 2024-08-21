@@ -126,7 +126,6 @@ test('embed attachments, including its content, on the JUnit report', async ({},
 ## TO DOs
 
 - implement code coverage
-- address issues in the upstream Playwright project
 - integrate with @xray-app/xray-automation-js to upload results
 - cleanup
 
