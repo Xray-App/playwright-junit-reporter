@@ -13,7 +13,8 @@ class ContentTypeMapper{
       case 'application/zip':
         return '.zip';
       default:
-        throw new console.warn(`could not map filetype of: ${contentType} to a correct ending`);
+        console.warn(`could not map filetype of: ${contentType} to a correct ending`);
+        return '';
     }
   }
 }
