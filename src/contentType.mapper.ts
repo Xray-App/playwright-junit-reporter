@@ -1,5 +1,4 @@
-export type FileExtension = 'image/png' | 'text/plain' | 'video/webm' | 'application/zip';
-
+export type FileExtension = 'image/png' | 'text/plain' | 'text/html' | 'video/webm' | 'application/zip';
 class ContentTypeMapper{
 
   getFileExtenion(contentType: FileExtension): string {
@@ -8,12 +7,15 @@ class ContentTypeMapper{
         return '.png';
       case 'text/plain':
         return '.txt';
+      case 'text/html':
+        return '.html';
       case 'video/webm':
         return '.webm';
       case 'application/zip':
         return '.zip';
       default:
-        throw new console.warn(`could not map filetype of: ${contentType} to a correct ending`);
+        console.warn(`could not map filetype of: ${contentType} to a correct ending`);
+        return '';
     }
   }
 }
