@@ -39,14 +39,16 @@ class XrayJUnitReporter implements Reporter {
   private outputFile: string | undefined;
   private stripANSIControlSequences = false;
   private embedAnnotationsAsProperties = false;
+  private embedTagsAsProperties = false;
   private textContentAnnotations: string[] | undefined;
   private embedAttachmentsAsProperty: string | undefined;
 
 
-  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string } = {}) {
+  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, embedTagsAsProperties?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string } = {}) {
     this.outputFile = options.outputFile || reportOutputNameFromEnv();
     this.stripANSIControlSequences = options.stripANSIControlSequences || false;
     this.embedAnnotationsAsProperties = options.embedAnnotationsAsProperties || false;
+    this.embedTagsAsProperties = options.embedTagsAsProperties || false;
     this.textContentAnnotations = options.textContentAnnotations || [];
     this.embedAttachmentsAsProperty = options.embedAttachmentsAsProperty;
   }
@@ -181,6 +183,19 @@ class XrayJUnitReporter implements Reporter {
           };
           properties.children?.push(property);
         }
+      }
+    }
+
+    if (this.embedTagsAsProperties && test.tags) {
+      for (const tag of test.tags) {
+        const property: XMLEntry = {
+          name: 'property',
+          attributes: {
+            name: 'tag',
+            value: tag
+          }
+        };
+        properties.children?.push(property);
       }
     }
 

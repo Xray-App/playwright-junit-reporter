@@ -395,6 +395,32 @@ test('should render all annotations to testcase value based properties, if reque
   expect(result.exitCode).toBe(0);
 });
 
+test('should render all tags to testcase value based properties, if requested', async ({ runInlineTest }) => {
+  const result = await runInlineTest({
+    'playwright.config.ts': `
+      const xrayOptions = {
+        embedTagsAsProperties: true
+      }
+      module.exports = {
+        reporter: [ ['${THIS_REPORTER}', xrayOptions] ],
+      };
+    `,
+    'a.test.js': `
+      import { test, expect } from '@playwright/test';
+      test('one', { tag: ['@flaky', '@regression'] }, ({}) => {});
+    `
+  }, { reporter: '' });
+  const xml = parseXML(result.output);
+  const testcase = xml['testsuites']['testsuite'][0]['testcase'][0];
+  expect(testcase['properties']).toBeTruthy();
+  expect(testcase['properties'][0]['property'].length).toBe(2);
+  expect(testcase['properties'][0]['property'][0]['$']['name']).toBe('tag');
+  expect(testcase['properties'][0]['property'][0]['$']['value']).toBe('@flaky');
+  expect(testcase['properties'][0]['property'][1]['$']['name']).toBe('tag');
+  expect(testcase['properties'][0]['property'][1]['$']['value']).toBe('@regression');
+  expect(result.exitCode).toBe(0);
+});
+
 test('should embed attachments to a custom testcase property, if explicitly requested', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
