@@ -65,6 +65,9 @@ const xrayOptions = {
   // These annotations are reported as <property name=''>value</property>.
   textContentAnnotations: ['test_description'],
 
+  // Whether to add <properties> with all tags; default is false
+  embedTagsAsProperties: true,
+
   // This will create a "testrun_evidence" property that contains all attachments. Each attachment is added as an inner <item> element.
   // Disables [[ATTACHMENT|path]] in the <system-out>.
   embedAttachmentsAsProperty: 'testrun_evidence',
