@@ -41,14 +41,23 @@ class XrayJUnitReporter implements Reporter {
   private embedAnnotationsAsProperties = false;
   private textContentAnnotations: string[] | undefined;
   private embedAttachmentsAsProperty: string | undefined;
+  private removeTestCasesWithoutTestKey: boolean = false;
+  private requiredTestKeyRegex: RegExp = RegExp('');
 
 
-  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string } = {}) {
+  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, removeTestCasesWithoutTestKey?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string, requiredTestKeyRegex?: RegExp | string } = {}) {
     this.outputFile = options.outputFile || reportOutputNameFromEnv();
     this.stripANSIControlSequences = options.stripANSIControlSequences || false;
     this.embedAnnotationsAsProperties = options.embedAnnotationsAsProperties || false;
+    this.removeTestCasesWithoutTestKey = options.removeTestCasesWithoutTestKey || false;
     this.textContentAnnotations = options.textContentAnnotations || [];
     this.embedAttachmentsAsProperty = options.embedAttachmentsAsProperty;
+    if (!options.requiredTestKeyRegex)
+      this.requiredTestKeyRegex = RegExp('');
+    else if (typeof options.requiredTestKeyRegex === 'string')
+      this.requiredTestKeyRegex = RegExp(options.requiredTestKeyRegex);
+    else
+      this.requiredTestKeyRegex = options.requiredTestKeyRegex;
   }
 
   printsToStdio() {
@@ -103,7 +112,7 @@ class XrayJUnitReporter implements Reporter {
     let skipped = 0;
     let failures = 0;
     let duration = 0;
-    const children: XMLEntry[] = [];
+    let children: XMLEntry[] = [];
 
     suite.allTests().forEach(test => {
       ++tests;
@@ -118,6 +127,9 @@ class XrayJUnitReporter implements Reporter {
     this.totalTests += tests;
     this.totalSkipped += skipped;
     this.totalFailures += failures;
+
+    if (this.removeTestCasesWithoutTestKey)
+      children = removeTestCases(children, this.requiredTestKeyRegex);
 
     const entry: XMLEntry = {
       name: 'testsuite',
@@ -292,6 +304,30 @@ function serializeXML(entry: XMLEntry, tokens: string[], stripANSIControlSequenc
   if (entry.text)
     tokens.push(escape(entry.text, stripANSIControlSequences, true));
   tokens.push(`</${entry.name}>`);
+}
+
+function removeTestCases(entries: XMLEntry[], regexPattern: RegExp): XMLEntry[] {
+  let result: XMLEntry[] = [];
+
+  result = entries.filter(entry => {
+    if (entry.name === 'testcase') {
+      for (const child of entry.children) {
+        // only looking for "property" children inside "properties"
+        if (child.name !== 'properties')
+          continue;
+        if (child.children) {
+          for (const property of child.children) {
+            if (property.attributes) {
+              if (property.attributes?.name === 'test_key' && regexPattern.test(property.attributes?.value.toString()))
+                return true;
+            }
+          }
+        }
+      }
+    }
+    return false;
+  });
+  return result;
 }
 
 // See https://en.wikipedia.org/wiki/Valid_characters_in_XML
