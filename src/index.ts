@@ -41,14 +41,14 @@ class XrayJUnitReporter implements Reporter {
   private embedAnnotationsAsProperties = false;
   private textContentAnnotations: string[] | undefined;
   private embedAttachmentsAsProperty: string | undefined;
-  private removeTestCasesWithoutTestKey: boolean = false;
+  private ignoreTestCasesWithoutTestKey: boolean = false;
 
 
-  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, removeTestCasesWithoutTestKey?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string } = {}) {
+  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, ignoreTestCasesWithoutTestKey?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string } = {}) {
     this.outputFile = options.outputFile || reportOutputNameFromEnv();
     this.stripANSIControlSequences = options.stripANSIControlSequences || false;
     this.embedAnnotationsAsProperties = options.embedAnnotationsAsProperties || false;
-    this.removeTestCasesWithoutTestKey = options.removeTestCasesWithoutTestKey || false;
+    this.ignoreTestCasesWithoutTestKey = options.ignoreTestCasesWithoutTestKey || false;
     this.textContentAnnotations = options.textContentAnnotations || [];
     this.embedAttachmentsAsProperty = options.embedAttachmentsAsProperty;
   }
@@ -108,7 +108,7 @@ class XrayJUnitReporter implements Reporter {
     const children: XMLEntry[] = [];
 
     suite.allTests().forEach(test => {
-      if (this.removeTestCasesWithoutTestKey && !hasAnnotationTestKey(test))
+      if (this.ignoreTestCasesWithoutTestKey && !hasAnnotationTestKey(test))
         return;
 
       ++tests;
