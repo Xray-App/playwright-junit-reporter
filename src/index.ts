@@ -42,22 +42,15 @@ class XrayJUnitReporter implements Reporter {
   private textContentAnnotations: string[] | undefined;
   private embedAttachmentsAsProperty: string | undefined;
   private removeTestCasesWithoutTestKey: boolean = false;
-  private requiredTestKeyRegex: RegExp = RegExp('');
 
 
-  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, removeTestCasesWithoutTestKey?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string, requiredTestKeyRegex?: RegExp | string } = {}) {
+  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, removeTestCasesWithoutTestKey?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string } = {}) {
     this.outputFile = options.outputFile || reportOutputNameFromEnv();
     this.stripANSIControlSequences = options.stripANSIControlSequences || false;
     this.embedAnnotationsAsProperties = options.embedAnnotationsAsProperties || false;
     this.removeTestCasesWithoutTestKey = options.removeTestCasesWithoutTestKey || false;
     this.textContentAnnotations = options.textContentAnnotations || [];
     this.embedAttachmentsAsProperty = options.embedAttachmentsAsProperty;
-    if (!options.requiredTestKeyRegex)
-      this.requiredTestKeyRegex = RegExp('');
-    else if (typeof options.requiredTestKeyRegex === 'string')
-      this.requiredTestKeyRegex = RegExp(options.requiredTestKeyRegex);
-    else
-      this.requiredTestKeyRegex = options.requiredTestKeyRegex;
   }
 
   printsToStdio() {
@@ -129,7 +122,7 @@ class XrayJUnitReporter implements Reporter {
     this.totalFailures += failures;
 
     if (this.removeTestCasesWithoutTestKey)
-      children = removeTestCases(children, this.requiredTestKeyRegex);
+      children = removeTestCases(children);
 
     const entry: XMLEntry = {
       name: 'testsuite',
@@ -306,7 +299,7 @@ function serializeXML(entry: XMLEntry, tokens: string[], stripANSIControlSequenc
   tokens.push(`</${entry.name}>`);
 }
 
-function removeTestCases(entries: XMLEntry[], regexPattern: RegExp): XMLEntry[] {
+function removeTestCases(entries: XMLEntry[]): XMLEntry[] {
   let result: XMLEntry[] = [];
 
   result = entries.filter(entry => {
@@ -318,7 +311,7 @@ function removeTestCases(entries: XMLEntry[], regexPattern: RegExp): XMLEntry[] 
         if (child.children) {
           for (const property of child.children) {
             if (property.attributes) {
-              if (property.attributes?.name === 'test_key' && regexPattern.test(property.attributes?.value.toString()))
+              if (property.attributes?.name === 'test_key')
                 return true;
             }
           }
