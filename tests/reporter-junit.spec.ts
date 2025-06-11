@@ -496,3 +496,155 @@ test.describe('report location', () => {
     expect(fs.existsSync(testInfo.outputPath('foo', 'bar', 'baz', 'my-report.xml'))).toBe(true);
   });
 });
+
+test.describe('remove testcases without test_key property', () => {
+  test('deactivated option should contain all tests', async ({ runInlineTest }) => {
+    const result = await runInlineTest({
+      'playwright.config.ts': `
+        const xrayOptions = {
+        embedAnnotationsAsProperties: true,
+        ignoreTestCasesWithoutTestKey: false  // this is default
+      }
+      module.exports = {
+        reporter: [ ['${THIS_REPORTER}', xrayOptions] ],
+      };
+      `,
+      'a.test.js': `
+        import { test, expect } from '@playwright/test';
+        test('one', async ({}, testInfo) => {
+          testInfo.annotations.push({ type: 'test_key', description: 'CALC-1' });
+          expect(1).toBe(1);
+        });
+        test('two', async ({}, testInfo) => {
+          testInfo.annotations.push({ type: 'test_id', description: '1234' });
+          expect(1).toBe(1);
+        });
+      `
+    }, { reporter: '' });
+    const xml = parseXML(result.output);
+    expect(xml['testsuites']['testsuite'][0]['testcase'].length).toBe(2);
+
+    const testcase_one = xml['testsuites']['testsuite'][0]['testcase'][0];
+    const testcase_two = xml['testsuites']['testsuite'][0]['testcase'][1];
+
+    expect(testcase_one['properties']).toBeTruthy();
+    expect(testcase_one['properties'][0]['property'].length).toBe(1);
+    expect(testcase_one['properties'][0]['property'][0]['$']['name']).toBe('test_key');
+    expect(testcase_one['properties'][0]['property'][0]['$']['value']).toBe('CALC-1');
+
+    expect(testcase_two['properties']).toBeTruthy();
+    expect(testcase_two['properties'][0]['property'].length).toBe(1);
+    expect(testcase_two['properties'][0]['property'][0]['$']['name']).toBe('test_id');
+    expect(testcase_two['properties'][0]['property'][0]['$']['value']).toBe('1234');
+
+    expect(result.exitCode).toBe(0);
+  });
+
+  test('missing option behaves like deactived', async ({ runInlineTest }) => {
+    const result = await runInlineTest({
+      'playwright.config.ts': `
+        const xrayOptions = {
+        embedAnnotationsAsProperties: true
+      }
+      module.exports = {
+        reporter: [ ['${THIS_REPORTER}', xrayOptions] ],
+      };
+      `,
+      'a.test.js': `
+        import { test, expect } from '@playwright/test';
+        test('one', async ({}, testInfo) => {
+          testInfo.annotations.push({ type: 'test_key', description: 'CALC-1' });
+          expect(1).toBe(1);
+        });
+        test('two', async ({}, testInfo) => {
+          testInfo.annotations.push({ type: 'test_id', description: '1234' });
+          expect(1).toBe(1);
+        });
+      `
+    }, { reporter: '' });
+    const xml = parseXML(result.output);
+    expect(xml['testsuites']['testsuite'][0]['testcase'].length).toBe(2);
+
+    const testcase_one = xml['testsuites']['testsuite'][0]['testcase'][0];
+    const testcase_two = xml['testsuites']['testsuite'][0]['testcase'][1];
+
+    expect(testcase_one['properties']).toBeTruthy();
+    expect(testcase_one['properties'][0]['property'].length).toBe(1);
+    expect(testcase_one['properties'][0]['property'][0]['$']['name']).toBe('test_key');
+    expect(testcase_one['properties'][0]['property'][0]['$']['value']).toBe('CALC-1');
+
+    expect(testcase_two['properties']).toBeTruthy();
+    expect(testcase_two['properties'][0]['property'].length).toBe(1);
+    expect(testcase_two['properties'][0]['property'][0]['$']['name']).toBe('test_id');
+    expect(testcase_two['properties'][0]['property'][0]['$']['value']).toBe('1234');
+
+    expect(result.exitCode).toBe(0);
+  });
+
+  test('one test_key, activated option should remove testcase two', async ({ runInlineTest }) => {
+    const result = await runInlineTest({
+      'playwright.config.ts': `
+        const xrayOptions = {
+        embedAnnotationsAsProperties: true,
+        ignoreTestCasesWithoutTestKey: true
+      }
+      module.exports = {
+        reporter: [ ['${THIS_REPORTER}', xrayOptions] ],
+      };
+      `,
+      'a.test.js': `
+        import { test, expect } from '@playwright/test';
+        test('one', async ({}, testInfo) => {
+          testInfo.annotations.push({ type: 'test_key', description: 'CALC-1' });
+          expect(1).toBe(1);
+        });
+        test('two', async ({}, testInfo) => {
+          testInfo.annotations.push({ type: 'test_id', description: '1234' });
+          expect(1).toBe(1);
+        });
+      `
+    }, { reporter: '' });
+    const xml = parseXML(result.output);
+    expect(xml['testsuites']['testsuite'][0]['testcase'].length).toBe(1);
+
+    const testcase_one = xml['testsuites']['testsuite'][0]['testcase'][0];
+    const testcase_two = xml['testsuites']['testsuite'][0]['testcase'][1];
+
+    expect(testcase_one['properties']).toBeTruthy();
+    expect(testcase_one['properties'][0]['property'].length).toBe(1);
+    expect(testcase_one['properties'][0]['property'][0]['$']['name']).toBe('test_key');
+    expect(testcase_one['properties'][0]['property'][0]['$']['value']).toBe('CALC-1');
+
+    expect(testcase_two).toBeFalsy();
+    expect(result.exitCode).toBe(0);
+  });
+
+  test('no test_keys, remove all testcases', async ({ runInlineTest }) => {
+    const result = await runInlineTest({
+      'playwright.config.ts': `
+        const xrayOptions = {
+        embedAnnotationsAsProperties: true,
+        ignoreTestCasesWithoutTestKey: true
+      }
+      module.exports = {
+        reporter: [ ['${THIS_REPORTER}', xrayOptions] ],
+      };
+      `,
+      'a.test.js': `
+        import { test, expect } from '@playwright/test';
+        test('one', async ({}, testInfo) => {
+          testInfo.annotations.push({ type: 'test_id', description: '1235' });
+          expect(1).toBe(1);
+        });
+        test('two', async ({}, testInfo) => {
+          testInfo.annotations.push({ type: 'test_id', description: '1234' });
+          expect(1).toBe(1);
+        });
+      `
+    }, { reporter: '' });
+    const xml = parseXML(result.output);
+    expect(xml['testsuites']['testsuite'][0]).toBeTruthy();
+    expect(xml['testsuites']['testsuite'][0]['testcase']).toBeFalsy();
+    expect(result.exitCode).toBe(0);
+  });
+});

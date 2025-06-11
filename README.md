@@ -61,6 +61,11 @@ const xrayOptions = {
   // Whether to add <properties> with all annotations; default is false
   embedAnnotationsAsProperties: true,
 
+  // Whether to ignore tests that do not contain an annotation of type 'test_key'; default is false
+  // This is useful, if you have tests without a test_key property in your testsuite, 
+  // but still want to import the report into Xray without those tests.
+  ignoreTestCasesWithoutTestKey: false,
+
   // By default, annotation is reported as <property name='' value=''>.
   // These annotations are reported as <property name=''>value</property>.
   textContentAnnotations: ['test_description'],

@@ -41,12 +41,14 @@ class XrayJUnitReporter implements Reporter {
   private embedAnnotationsAsProperties = false;
   private textContentAnnotations: string[] | undefined;
   private embedAttachmentsAsProperty: string | undefined;
+  private ignoreTestCasesWithoutTestKey: boolean = false;
 
 
-  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string } = {}) {
+  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, ignoreTestCasesWithoutTestKey?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string } = {}) {
     this.outputFile = options.outputFile || reportOutputNameFromEnv();
     this.stripANSIControlSequences = options.stripANSIControlSequences || false;
     this.embedAnnotationsAsProperties = options.embedAnnotationsAsProperties || false;
+    this.ignoreTestCasesWithoutTestKey = options.ignoreTestCasesWithoutTestKey || false;
     this.textContentAnnotations = options.textContentAnnotations || [];
     this.embedAttachmentsAsProperty = options.embedAttachmentsAsProperty;
   }
@@ -106,6 +108,9 @@ class XrayJUnitReporter implements Reporter {
     const children: XMLEntry[] = [];
 
     suite.allTests().forEach(test => {
+      if (this.ignoreTestCasesWithoutTestKey && !hasAnnotationTestKey(test))
+        return;
+
       ++tests;
       if (test.outcome() === 'skipped')
         ++skipped;
@@ -292,6 +297,15 @@ function serializeXML(entry: XMLEntry, tokens: string[], stripANSIControlSequenc
   if (entry.text)
     tokens.push(escape(entry.text, stripANSIControlSequences, true));
   tokens.push(`</${entry.name}>`);
+}
+
+function hasAnnotationTestKey(test: TestCase): boolean {
+  for (const annotation of test.annotations) {
+    if (annotation.type === 'test_key')
+      return true;
+  }
+
+  return false;
 }
 
 // See https://en.wikipedia.org/wiki/Valid_characters_in_XML
