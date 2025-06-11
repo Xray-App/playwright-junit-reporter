@@ -63,7 +63,7 @@ const xrayOptions = {
 
   // Whether to ignore tests that do not contain an annotation of type 'test_key'; default is false
   // This is useful, if you have tests without a test_key property in your testsuite, 
-  // but still want to import the report into xray cloud without those tests.
+  // but still want to import the report into Xray without those tests.
   ignoreTestCasesWithoutTestKey: false,
 
   // By default, annotation is reported as <property name='' value=''>.
