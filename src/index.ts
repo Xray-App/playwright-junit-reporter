@@ -105,9 +105,12 @@ class XrayJUnitReporter implements Reporter {
     let skipped = 0;
     let failures = 0;
     let duration = 0;
-    let children: XMLEntry[] = [];
+    const children: XMLEntry[] = [];
 
     suite.allTests().forEach(test => {
+      if (this.removeTestCasesWithoutTestKey && !hasAnnotationTestKey(test))
+        return;
+
       ++tests;
       if (test.outcome() === 'skipped')
         ++skipped;
@@ -120,9 +123,6 @@ class XrayJUnitReporter implements Reporter {
     this.totalTests += tests;
     this.totalSkipped += skipped;
     this.totalFailures += failures;
-
-    if (this.removeTestCasesWithoutTestKey)
-      children = removeTestCases(children);
 
     const entry: XMLEntry = {
       name: 'testsuite',
@@ -299,28 +299,13 @@ function serializeXML(entry: XMLEntry, tokens: string[], stripANSIControlSequenc
   tokens.push(`</${entry.name}>`);
 }
 
-function removeTestCases(entries: XMLEntry[]): XMLEntry[] {
-  let result: XMLEntry[] = [];
+function hasAnnotationTestKey(test: TestCase): boolean {
+  for (const annotation of test.annotations) {
+    if (annotation.type === 'test_key')
+      return true;
+  }
 
-  result = entries.filter(entry => {
-    if (entry.name === 'testcase') {
-      for (const child of entry.children) {
-        // only looking for "property" children inside "properties"
-        if (child.name !== 'properties')
-          continue;
-        if (child.children) {
-          for (const property of child.children) {
-            if (property.attributes) {
-              if (property.attributes?.name === 'test_key')
-                return true;
-            }
-          }
-        }
-      }
-    }
-    return false;
-  });
-  return result;
+  return false;
 }
 
 // See https://en.wikipedia.org/wiki/Valid_characters_in_XML
