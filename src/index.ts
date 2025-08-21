@@ -195,7 +195,7 @@ class XrayJUnitReporter implements Reporter {
       }
     }
 
-    // embed annotations that start with "tr:" as item properties, by creatting a property with name 'testrun_customfields' and several children items named after the annotation type and the annotation description as text content as CDATA
+    // embed annotations that start with "tr:" as item properties, by creating a property with name 'testrun_customfields' and several children items named after the annotation type and the annotation description as text content as CDATA
     if (this.embedTestrunAnnotationsAsItemProperties && test.annotations) {
       const customFields: XMLEntry = {
         name: 'property',
