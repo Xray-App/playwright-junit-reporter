@@ -71,7 +71,7 @@ const xrayOptions = {
   ignoreTestCasesWithoutTestKey: false,
 
   // By default, annotation is reported as <property name='' value=''>.
-  // These annotations are reported as <property name=''>value</property>. This only applies if using the `embedAnnotationsAsProperties` setting; it's not applicable to the test run related annotations that ared handled by the `embedAnnotationsAsItemProperties` setting.
+  // These annotations are reported as <property name=''>value</property>. This only applies if using the `embedAnnotationsAsProperties` setting; it's not applicable to the test run related annotations that are handled by the `embedAnnotationsAsItemProperties` setting.
   textContentAnnotations: ['test_description', 'testrun_comment'],
 
   // This will create a "testrun_evidence" property that contains all attachments. Each attachment is added as an inner <item> element.
