@@ -61,7 +61,7 @@ const xrayOptions = {
   // Whether to add <properties> with all annotations (except the ones that start with "tr:"); default is false.
   embedAnnotationsAsProperties: true,
 
-  // Whether to add test run related annotations (the ones whose type/name is "tr:xxxx"), that map to custom fields on the Test Runs, as <items> within a special `<property name="testrun_customfields">` 
+  // Whether to add test run related annotations (the ones whose type/name is "tr:xxxx"), that map to custom fields on the Test Runs, as <items> within a special `<property name="testrun_customfields">`; default is false.
   embedTestrunAnnotationsAsItemProperties: true,
 
 
