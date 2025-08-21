@@ -58,8 +58,12 @@ import { defineConfig } from '@playwright/test';
 
 // JUnit reporter config for Xray
 const xrayOptions = {
-  // Whether to add <properties> with all annotations; default is false
+  // Whether to add <properties> with all annotations (except the ones that start with "tr:"); default is false.
   embedAnnotationsAsProperties: true,
+
+  // Whether to add test run related annotations (the ones whose type/name is "tr:xxxx"), that map to custom fields on the Test Runs, as <items> within a special `<property name="testrun_customfields">`; default is false.
+  embedTestrunAnnotationsAsItemProperties: true,
+
 
   // Whether to ignore tests that do not contain an annotation of type 'test_key'; default is false
   // This is useful, if you have tests without a test_key property in your testsuite, 
@@ -67,8 +71,8 @@ const xrayOptions = {
   ignoreTestCasesWithoutTestKey: false,
 
   // By default, annotation is reported as <property name='' value=''>.
-  // These annotations are reported as <property name=''>value</property>.
-  textContentAnnotations: ['test_description'],
+  // These annotations are reported as <property name=''>value</property>. This only applies if using the `embedAnnotationsAsProperties` setting; it's not applicable to the test run related annotations that are handled by the `embedAnnotationsAsItemProperties` setting.
+  textContentAnnotations: ['test_description', 'testrun_comment'],
 
   // This will create a "testrun_evidence" property that contains all attachments. Each attachment is added as an inner <item> element.
   // Disables [[ATTACHMENT|path]] in the <system-out>.
@@ -91,11 +95,22 @@ Annotations can be used to, for example, link a Playwright test with an existing
 import { test } from '@playwright/test';
 
 test('using specific annotations for passing test metadata to Xray', async ({}, testInfo) => {
+  // Xray will process only properties from the Junit XML report that it is aware of; other properties are discarded
   testInfo.annotations.push({ type: 'test_id', description: '1234' });
   testInfo.annotations.push({ type: 'test_key', description: 'CALC-2' });
   testInfo.annotations.push({ type: 'test_summary', description: 'sample summary' });
   testInfo.annotations.push({ type: 'requirements', description: 'CALC-5,CALC-6' });
   testInfo.annotations.push({ type: 'test_description', description: 'sample description' });
+
+  // add some information to custom fields on the Test Run; these custom fields need to be created before in Xray settings, eventually on the project settings
+  // setting some text on a TR custom field of type "text - single line"
+  testInfo.annotations.push({ type: 'tr:basic_cf', description: 'dummycontent' });
+  // setting some text on a TR custom field of type "multiselect", with checked options delimited using ;
+  testInfo.annotations.push({ type: 'tr:multiselect_cf', description: 'a;b;c' });
+  // setting some text on a TR custom field of type "text"
+  const multilineString = "Hello world\nThis is a multiline string";
+  testInfo.annotations.push({ type: 'tr:multiline_cf', description: multilineString });
+
 });
 ```
 
@@ -128,15 +143,30 @@ test('embed attachments, including its content, on the JUnit report', async ({},
 });
 ```
 
+## Summary of supported attributes of the evolved JUnit XML format
+
+
+| Attributes | Usage Example |
+|---|---|
+| test_id  | testInfo.annotations.push({ type: 'test_id', description: '1234' }); |
+| test_key  | testInfo.annotations.push({ type: 'test_id', description: 'CALC-124' }); |
+| requirements  | testInfo.annotations.push({ type: 'requirements', description: 'CALC-2' }); |
+| testrun_comment  | testInfo.annotations.push({ type: 'testrun_comment', description: 'some comment, even\nmultiline' }); |
+| test_summary  | testInfo.annotations.push({ type: 'test_summary', description: 'valid login scenario' }); |
+| test_description  | testInfo.annotations.push({ type: 'test_description', description: 'tests the valid login scenario\nwhere user enters valid credentials and checks the redirect page' }); |
+| tr:xxx | testInfo.annotations.push({ type: 'tr:some_testrun_customfield', description: 'some extra info' }); |
+| _attachments_ |  testInfo.attach('evidence2.txt', { body: Buffer.from('world'), contentType: 'text/plain' }); |
+| tags (i.e., labels) |  testInfo.annotations.push({ type: 'tags', description: 'label1,label2' }); |
+
+
 ## TO DOs
 
 - implement code coverage
 - integrate with @xray-app/xray-automation-js to upload results
-- cleanup
 
 ## Contact
 
-You may find me on [Twitter](https://twitter.com/darktelecom).
+You may find me on [Twitter](https://x.com/darktelecom).
 Any questions related with this code, please raise issues in this GitHub project. Feel free to contribute and submit PR's.
 For Xray specific questions, please contact [Xray's support team](https://jira.getxray.app/servicedesk/customer/portal/2).
 

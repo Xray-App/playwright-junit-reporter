@@ -395,6 +395,86 @@ test('should render all annotations to testcase value based properties, if reque
   expect(result.exitCode).toBe(0);
 });
 
+test('should embed test run custom fields as items under a property named testrun_customfields', async ({ runInlineTest }) => {
+  const result = await runInlineTest({
+    'playwright.config.ts': `
+      const xrayOptions = {
+        embedTestrunAnnotationsAsItemProperties: true
+      }
+      module.exports = {
+        reporter: [ ['${THIS_REPORTER}', xrayOptions] ],
+      };
+    `,
+    'a.test.js': `
+      import { test, expect } from '@playwright/test';
+      test('one', async ({}, testInfo) => {
+        // this is a test case annotation, not a test run annotation, and it shouldn't be rendered
+        testInfo.annotations.push({ type: 'test_id', description: '9876' });
+
+        testInfo.annotations.push({ type: 'tr:some_id', description: '1234' });
+        testInfo.annotations.push({ type: 'tr:other_cf', description: 'a;b;c' });
+        const multilineString = "Hello world\\nThis is a multiline string";
+        testInfo.annotations.push({ type: 'tr:multiline_cf', description: multilineString });
+      });
+    `
+  }, { reporter: '' });
+  const xml = parseXML(result.output);
+  const testcase = xml['testsuites']['testsuite'][0]['testcase'][0];
+  expect(testcase['properties']).toBeTruthy();
+  expect(testcase['properties'][0]['property'].length).toBe(1);
+  expect(testcase['properties'][0]['property'][0]['$']['name']).toBe('testrun_customfields');
+  expect(testcase['properties'][0]['property'][0]['item'].length).toBe(3);
+  expect(testcase['properties'][0]['property'][0]['item'][0]['$']['name']).toBe('some_id');
+  expect(testcase['properties'][0]['property'][0]['item'][0]['_'].trim()).toBe('1234');
+  expect(testcase['properties'][0]['property'][0]['item'][1]['$']['name']).toBe('other_cf');
+  expect(testcase['properties'][0]['property'][0]['item'][1]['_'].trim()).toBe('a;b;c');
+  expect(testcase['properties'][0]['property'][0]['item'][2]['$']['name']).toBe('multiline_cf');
+  expect(testcase['properties'][0]['property'][0]['item'][2]['_'].trim()).toBe('Hello world\\\\This is a multiline string');
+  expect(result.exitCode).toBe(0);
+});
+
+test('should embed test run custom fields as items under a property named testrun_customfields but not as regular properties', async ({ runInlineTest }) => {
+  const result = await runInlineTest({
+    'playwright.config.ts': `
+      const xrayOptions = {
+        embedAnnotationsAsProperties: true,
+        embedTestrunAnnotationsAsItemProperties: true
+      }
+      module.exports = {
+        reporter: [ ['${THIS_REPORTER}', xrayOptions] ],
+      };
+    `,
+    'a.test.js': `
+      import { test, expect } from '@playwright/test';
+      test('one', async ({}, testInfo) => {
+        // this is a test case annotation, not a test run annotation, and it should be the only one rendered as a regular property
+        testInfo.annotations.push({ type: 'test_id', description: '9876' });
+
+        testInfo.annotations.push({ type: 'tr:some_id', description: '1234' });
+        testInfo.annotations.push({ type: 'tr:other_cf', description: 'a;b;c' });
+        const multilineString = "Hello world\\nThis is a multiline string";
+        testInfo.annotations.push({ type: 'tr:multiline_cf', description: multilineString });
+      });
+    `
+  }, { reporter: '' });
+  const xml = parseXML(result.output);
+  const testcase = xml['testsuites']['testsuite'][0]['testcase'][0];
+  expect(testcase['properties']).toBeTruthy();
+  expect(testcase['properties'][0]['property'].length).toBe(2);
+  expect(testcase['properties'][0]['property'][0]['$']['name']).toBe('test_id');
+  expect(testcase['properties'][0]['property'][0]['$']['value']).toBe('9876');
+
+  expect(testcase['properties'][0]['property'][1]['$']['name']).toBe('testrun_customfields');
+  expect(testcase['properties'][0]['property'][1]['item'].length).toBe(3);
+  expect(testcase['properties'][0]['property'][1]['item'][0]['$']['name']).toBe('some_id');
+  expect(testcase['properties'][0]['property'][1]['item'][0]['_'].trim()).toBe('1234');
+  expect(testcase['properties'][0]['property'][1]['item'][1]['$']['name']).toBe('other_cf');
+  expect(testcase['properties'][0]['property'][1]['item'][1]['_'].trim()).toBe('a;b;c');
+  expect(testcase['properties'][0]['property'][1]['item'][2]['$']['name']).toBe('multiline_cf');
+  expect(testcase['properties'][0]['property'][1]['item'][2]['_'].trim()).toBe('Hello world\\\\This is a multiline string');
+  expect(result.exitCode).toBe(0);
+});
+
 test('should embed attachments to a custom testcase property, if explicitly requested', async ({ runInlineTest }) => {
   const result = await runInlineTest({
     'playwright.config.ts': `
