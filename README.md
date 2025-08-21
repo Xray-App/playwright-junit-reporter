@@ -151,7 +151,7 @@ test('embed attachments, including its content, on the JUnit report', async ({},
 | test_id  | testInfo.annotations.push({ type: 'test_id', description: '1234' }); |
 | test_key  | testInfo.annotations.push({ type: 'test_id', description: 'CALC-124' }); |
 | requirements  | testInfo.annotations.push({ type: 'requirements', description: 'CALC-2' }); |
-| testrun_comment  | testInfo.annotations.push({ type: 'testrun_comment', description: 'somme comment, even\nmultiline' }); |
+| testrun_comment  | testInfo.annotations.push({ type: 'testrun_comment', description: 'some comment, even\nmultiline' }); |
 | test_summary  | testInfo.annotations.push({ type: 'test_summary', description: 'valid login scenario' }); |
 | test_description  | testInfo.annotations.push({ type: 'test_description', description: 'tests the valid login scenario\nwhere user enters valid credentials and checks the redirect page' }); |
 | tr:xxx | testInfo.annotations.push({ type: 'tr:some_testrun_customfield', description: 'some extra info' }); |
