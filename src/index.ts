@@ -168,7 +168,6 @@ class XrayJUnitReporter implements Reporter {
     };
 
     if (this.embedAnnotationsAsProperties && test.annotations) {
-      
       // filter out annotations that start with "tr:"
       const filteredAnnotations = test.annotations.filter(annotation => !annotation.type.startsWith('tr:'));
 

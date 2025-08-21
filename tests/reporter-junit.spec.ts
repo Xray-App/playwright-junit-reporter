@@ -461,7 +461,7 @@ test('should embed test run custom fields as items under a property named testru
   const testcase = xml['testsuites']['testsuite'][0]['testcase'][0];
   expect(testcase['properties']).toBeTruthy();
   expect(testcase['properties'][0]['property'].length).toBe(2);
-    expect(testcase['properties'][0]['property'][0]['$']['name']).toBe('test_id');
+  expect(testcase['properties'][0]['property'][0]['$']['name']).toBe('test_id');
   expect(testcase['properties'][0]['property'][0]['$']['value']).toBe('9876');
 
   expect(testcase['properties'][0]['property'][1]['$']['name']).toBe('testrun_customfields');
