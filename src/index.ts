@@ -39,15 +39,17 @@ class XrayJUnitReporter implements Reporter {
   private outputFile: string | undefined;
   private stripANSIControlSequences = false;
   private embedAnnotationsAsProperties = false;
+  private embedTestrunAnnotationsAsItemProperties = false;
   private textContentAnnotations: string[] | undefined;
   private embedAttachmentsAsProperty: string | undefined;
   private ignoreTestCasesWithoutTestKey: boolean = false;
 
 
-  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, ignoreTestCasesWithoutTestKey?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string } = {}) {
+  constructor(options: { outputFile?: string, stripANSIControlSequences?: boolean, embedAnnotationsAsProperties?: boolean, embedTestrunAnnotationsAsItemProperties?: boolean, ignoreTestCasesWithoutTestKey?: boolean, textContentAnnotations?: string[], embedAttachmentsAsProperty?: string } = {}) {
     this.outputFile = options.outputFile || reportOutputNameFromEnv();
     this.stripANSIControlSequences = options.stripANSIControlSequences || false;
     this.embedAnnotationsAsProperties = options.embedAnnotationsAsProperties || false;
+    this.embedTestrunAnnotationsAsItemProperties = options.embedTestrunAnnotationsAsItemProperties || false;
     this.ignoreTestCasesWithoutTestKey = options.ignoreTestCasesWithoutTestKey || false;
     this.textContentAnnotations = options.textContentAnnotations || [];
     this.embedAttachmentsAsProperty = options.embedAttachmentsAsProperty;
@@ -166,14 +168,19 @@ class XrayJUnitReporter implements Reporter {
     };
 
     if (this.embedAnnotationsAsProperties && test.annotations) {
-      for (const annotation of test.annotations) {
+      
+      // filter out annotations that start with "tr:"
+      const filteredAnnotations = test.annotations.filter(annotation => !annotation.type.startsWith('tr:'));
+
+      for (const annotation of filteredAnnotations) {
         if (this.textContentAnnotations?.includes(annotation.type)) {
+          const clearDescription = annotation.description.replace(/\r?\n/g, '\\\\');
           const property: XMLEntry = {
             name: 'property',
             attributes: {
               name: annotation.type
             },
-            text: annotation.description
+            text: clearDescription
           };
           properties.children?.push(property);
         } else {
@@ -187,6 +194,33 @@ class XrayJUnitReporter implements Reporter {
           properties.children?.push(property);
         }
       }
+    }
+
+    // embed annotations that start with "tr:" as item properties, by creatting a property with name 'testrun_customfields' and several children items named after the annotation type and the annotation description as text content as CDATA
+    if (this.embedTestrunAnnotationsAsItemProperties && test.annotations) {
+      const customFields: XMLEntry = {
+        name: 'property',
+        attributes: {
+          name: 'testrun_customfields'
+        },
+        children: [] as XMLEntry[]
+      };
+      // filter annotations that start with "tr:"
+      const filteredAnnotations = test.annotations.filter(annotation => annotation.type.startsWith('tr:'));
+      for (const annotation of filteredAnnotations) {
+        const clearDescription = annotation.description.replace(/\r?\n/g, '\\\\');
+        const item: XMLEntry = {
+          name: 'item',
+          attributes: {
+          // remove the "tr:" prefix from the annotation type
+            name: annotation.type.replace(/^tr:/, '')
+          },
+          text: clearDescription
+        };
+        customFields.children?.push(item);
+      }
+      if (customFields.children?.length)
+        properties.children.push(customFields);
     }
 
     const systemErr: string[] = [];
