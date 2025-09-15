@@ -1,7 +1,7 @@
 export type FileExtension = 'image/png' | 'text/plain' | 'text/html' | 'video/webm' | 'application/zip' | 'text/markdown';
 class ContentTypeMapper{
 
-  getFileExtenion(contentType: FileExtension): string {
+  getFileExtension(contentType: FileExtension): string {
     switch (contentType) {
       case 'image/png':
         return '.png';
