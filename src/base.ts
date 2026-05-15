@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-import { colors, ms as milliseconds } from 'playwright-core/lib/utilsBundle';
-import { parseStackFrame } from 'playwright-core/lib/utils';
+import { colors, ms as milliseconds, monotonicTime } from 'playwright-core/lib/utilsBundle';
+// @ts-ignore
+import { iso } from 'playwright-core/lib/coreBundle';
+const { parseStackFrame } = iso;
+
 import fs from 'fs';
 import path from 'path';
 import type { FullConfig, TestCase, Suite, TestResult, FullResult, TestStep, Location, Reporter } from '@playwright/test/reporter';
 import { codeFrameColumns } from '@babel/code-frame';
-
-import { monotonicTime } from 'playwright-core/lib/utils';
 
 import type { FullProject } from '@playwright/test';
 export type TestResultOutput = { chunk: string | Buffer, type: 'stdout' | 'stderr' };
