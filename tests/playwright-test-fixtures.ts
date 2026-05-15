@@ -19,7 +19,6 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { PNG } from 'playwright-core/lib/utilsBundle';
-import { removeFolders } from 'playwright-core/lib/utils';
 import type { CommonFixtures, CommonWorkerFixtures, TestChildProcess } from './config/commonFixtures';
 import { commonFixtures } from './config/commonFixtures';
 import type { ServerFixtures, ServerWorkerOptions } from './config/serverFixtures';
@@ -111,9 +110,7 @@ async function runPlaywrightTest(childProcess: CommonFixtures['childProcess'], b
   const cwd = options.cwd ? path.resolve(baseDir, options.cwd) : baseDir;
   // eslint-disable-next-line prefer-const
   let { exitCode, output } = await runPlaywrightCommand(childProcess, cwd, args, {
-    // PW_TEST_REPORTER: path.join(__dirname, '../../packages/playwright-test/lib/reporters/json.js'),
-    PW_TEST_REPORTER: path.join(__dirname, '../node_modules/playwright/lib/reporters/json.js'),
-    // PW_TEST_REPORTER: path.join(__dirname, '../dist/index.js'),
+    PW_TEST_REPORTER: 'json',
     PLAYWRIGHT_JSON_OUTPUT_NAME: reportFile,
     ...env,
   }, options.sendSIGINTAfter);
@@ -381,4 +378,10 @@ export function expectTestHelper(result: RunResult) {
       expect(test.annotations.map(a => a.type), `title: ${title}`).toEqual(annotations);
     }
   };
+}
+
+export async function removeFolders(dirs: string[]): Promise<Error[]> {
+  return await Promise.all(dirs.map((dir: string) =>
+    fs.promises.rm(dir, { recursive: true, force: true, maxRetries: 10 }).catch(e => e)
+  ));
 }

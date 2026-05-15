@@ -19,7 +19,9 @@ import path from 'path';
 
 import type { FullConfig, FullResult, Reporter, Suite, TestCase } from '@playwright/test/reporter';
 import { formatFailure, stripAnsiEscapes } from './base';
-import { assert } from 'playwright-core/lib/utils';
+// @ts-ignore
+import { iso } from 'playwright-core/lib/coreBundle';
+const { assert } = iso;
 import type { FileExtension } from './contentType.mapper';
 import contentTypeMapper from './contentType.mapper';
 
